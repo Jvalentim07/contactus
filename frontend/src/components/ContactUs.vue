@@ -1,14 +1,15 @@
 <template>
   <div class="bodyContent">
-    <div class="box">
-      <h1 style="text-align: center;">Contact Us</h1>
-      <form style="margin-bottom: 50px ">
+    <div :class="status === null ? 'box' : 'boxResponse'">
+      <h2 v-if="status === null" style="margin-bottom: 20px;">Contact Us</h2>
+      <form v-if="status === null" style="margin-bottom: 50px ">
         <v-text-field
           v-model="firstName"
           :counter="40"
           :rules="firstNameRules"
           label="First Name"
           required
+          filled
         ></v-text-field>
         <v-text-field
           v-model="lastName"
@@ -16,6 +17,7 @@
           :rules="lastNameRules"
           label="Last Name"
           required
+          filled
         ></v-text-field>
         <div style="display: flex;">
           <v-select
@@ -26,6 +28,7 @@
             :rules="stateRules"
             label="State"
             required
+            filled
             @change="setCities()"
           ></v-select>
           <v-select
@@ -36,6 +39,7 @@
             :rules="cityRules"
             label="City"
             :counter="32"
+            filled
             required
           ></v-select>
         </div>
@@ -44,6 +48,7 @@
           label="Street Address"
           :rules="streetRules"
           :counter="128"
+          filled
           required
         ></v-text-field>
         <v-text-field
@@ -51,6 +56,7 @@
           :counter="128"
           label="Unit/Apt"
           :rules="[v => v.length <= 128 || 'Unit/Apt must be less than 128 characters']"
+          filled
           required
         ></v-text-field>
         <v-text-field
@@ -58,22 +64,38 @@
           :rules="emailRules"
           :counter="128"
           label="E-mail"
+          filled
           required
         ></v-text-field>
+        <v-checkbox
+          v-model="agree"
+          :rules="[v => !!v || 'You must agree to continue!']"
+          label="Do you agree?"
+          required
+        ></v-checkbox>
+        <div style="width: 100%; display: flex; justify-content: center;">
+          <v-btn
+            style="width: 200px; "
+            class="mr-4"
+            @click="sendContact()"
+            :disabled="agree ? false : true"
+            color="error"
+          >
+            submit
+          </v-btn>
 
-        <v-btn
-          class="mr-4"
-          @click="sendContact()"
-        >
-          submit
-        </v-btn>
+        </div>
       </form>
-      <v-alert
-        v-if="this.status !== null"
-        dismissible
-        :type="status === 200 ? 'success' : 'error'"
-      >{{this.status === 200 ? 'Contant sent successfully' : 'Somethin is wrong'}}
-      </v-alert>
+      <v-icon
+        v-if="status"
+        style="fontSize: 70px;"
+          dark
+          right
+        >
+          mdi-checkbox-marked-circle
+      </v-icon>
+      <div v-if="status" style="text-align: center; color: white; font-size: 20px">Contact sent successfully</div>
+      <div v-if="status" style="text-align: center; color: white; font-size: 20px; text-decoration: underline; cursor: pointer;" @click="status = null">Send another message</div>
     </div>
   </div>
 </template>
@@ -97,7 +119,8 @@ export default {
       email: '',
       states: ['AB', 'BC', 'MB', 'NB', 'NL', 'NT', 'NU', 'ON', 'PE', 'SK', 'QC', 'YT'],
       cities: [],
-      status: null,
+      status: 200,
+      agree: false,
       //Validation Rules -----------------------------------------------------------
       emailRules: [
         v => !!v || 'E-mail is required',
@@ -151,18 +174,31 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss">
   .bodyContent {
-    background-color: #040838;
+    background-color: #b8b8b8;
     height: 100%;
     display: flex;
-    justify-content: flex-end;
+    justify-content: center;
+    align-items: center;
     .box {
       background-color: #fff;
-      height: 100%;
-      width: 25%;
-      max-width: 400px;
+      height: 800px;
+      width: 35%;
+      max-width: 500px;
       min-width: 200px;
       padding: 30px;
+      border-radius: 10px;
+      box-shadow: 5px 5px 5px   #757575;
       // width: 300?px;
+    }
+    .boxResponse {
+      background-color: #15bf34;
+      width: 400px;
+      height: 200px;
+      display: flex;
+      align-content: center;
+      justify-content: center;
+      border-radius: 10px;
+      flex-direction: column;
     }
   }
 </style>
